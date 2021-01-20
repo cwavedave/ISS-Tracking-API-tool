@@ -16,10 +16,22 @@ data = response.json()
 latitude = data ["iss_position"]["latitude"]
 longitude = data["iss_position"]["longitude"]
 
-#TODO Figure this out later - Why are other columns throwing up key errors?
-index = abs(df['latitude'] - (latitude).idxmin())
-print(index)
-
+# #TODO Figure this out later - Why are other columns throwing up key errors?
+# index = abs(df['latitude'] - (latitude).idxmin())
+# print(index)
+#
 iss_position = (longitude,latitude)
 
 print(iss_position)
+
+vic_lo = 2.25486
+vic_la = 41.93012
+
+sun_response = requests.get(url=f'https://api.sunrise-sunset.org/json?lat={vic_la}&lng={vic_lo}&formatted=0')
+data = sun_response.json()
+
+sunrise = data["results"]["sunrise"].split("T")[1].split("+")[0][:-3]
+sunset = data["results"]["sunset"].split("T")[1].split("+")[0][:-3]
+
+print(sunrise)
+print(sunset)
