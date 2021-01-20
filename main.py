@@ -16,6 +16,10 @@ data = response.json()
 latitude = data ["iss_position"]["latitude"]
 longitude = data["iss_position"]["longitude"]
 
+#TODO Figure this out later - Why are other columns throwing up key errors?
+index = abs(df['latitude'] - (latitude).idxmin())
+print(index)
+
 iss_position = (longitude,latitude)
 
 print(iss_position)
