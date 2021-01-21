@@ -1,5 +1,10 @@
 import requests
 import pandas as pd
+import datetime as dt
+
+now = dt.datetime.now()
+
+print(now)
 
 countries_csv = pd.read_csv("countries.csv")
 countries_df = pd.DataFrame(countries_csv)
@@ -13,8 +18,8 @@ response.raise_for_status()
 
 data = response.json()
 
-latitude = data ["iss_position"]["latitude"]
-longitude = data["iss_position"]["longitude"]
+latitude = float(data["iss_position"]["latitude"])
+longitude = float(data["iss_position"]["longitude"])
 
 # #TODO Figure this out later - Why are other columns throwing up key errors?
 # index = abs(df['latitude'] - (latitude).idxmin())
@@ -30,8 +35,18 @@ vic_la = 41.93012
 sun_response = requests.get(url=f'https://api.sunrise-sunset.org/json?lat={vic_la}&lng={vic_lo}&formatted=0')
 data = sun_response.json()
 
-sunrise = data["results"]["sunrise"].split("T")[1].split("+")[0][:-3]
-sunset = data["results"]["sunset"].split("T")[1].split("+")[0][:-3]
+print(data)
 
-print(sunrise)
-print(sunset)
+current_time = int(str(now).split(' ')[1].split('.')[0][:-3].replace(":",""))
+print(current_time)
+
+sunrise = int(data["results"]["sunrise"].split("T")[1].split("+")[0][:-3].replace(":",""))
+sunset = int(data["results"]["sunset"].split("T")[1].split("+")[0][:-3].replace(":",""))
+
+if sunset < current_time:
+    print(f"Current time is {sunrise}")
+    print(f" Calculate {sunset - current_time}")
+    print(f"Sunset time is {sunset}")
+
+print(f"Sunrise time is {(lambda sunrise: sunrise.str()[:-3] + ':' + sunrise.str()[:-3])}")
+print(f"Sunrise time is {sunset}")
