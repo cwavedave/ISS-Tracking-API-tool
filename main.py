@@ -32,22 +32,42 @@ for l in latitudes:
     if isinstance(l,str):
         print("String Located")
 
-# def check_lat():
-#     nearby_lat = []
-#     for l in latitudes:
-#         if l > latitude -5 and l < latitude + 5:
-#             nearby_lat.append(l)
-#     return nearby_lat
-#
-# def check_long():
-#     nearby_long = []
-#     for l in longitudes:
-#         if l > longitude -5 and l < longitude + 5:
-#             nearby_long.append(l)
-#     return nearby_long
+def check_lat():
+    nearby_lat = []
+    for l in latitudes:
+        if l > latitude -5 and l < latitude + 5:
+            nearby_lat.append(l)
+    return nearby_lat
 
-# print(check_long())
-# print(check_lat())
+
+def check_long():
+    nearby_long = []
+    for l in longitudes:
+        if l > longitude -5 and l < longitude + 5:
+            nearby_long.append(l)
+    return nearby_long
+
+longitudes_nearby = check_long()
+latitudes_nearby = check_lat()
+
+def countries_nearby():
+    countries = []
+    index = 0
+    if len(longitudes_nearby) > len(latitudes_nearby):
+        check_range = longitudes_nearby
+    else:
+        check_range = longitudes_nearby
+
+    for country in check_range:
+        index += 1
+        latitude = df.loc[index]['latitude']
+        longitude = df.loc[index]['latitude']
+        country = df.loc[(df['latitude'] == latitude) & (df['latitude'] == longitude)]
+        print(country)
+        countries.append(country)
+        print(countries)
+
+countries_nearby()
 
 # latitude_match = df[df['latitude'].between(0, 100)]
 # latitude_match_2 = df[df['latitude'].between(0,100)]
