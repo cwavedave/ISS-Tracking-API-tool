@@ -18,69 +18,25 @@ data = response.json()
 latitude = float(data["iss_position"]["latitude"])
 longitude = float(data["iss_position"]["longitude"])
 
+print(f"ISS locations is {(latitude,longitude)}")
+
 print(df.iloc[1]['latitude'])
 
 latitudes = df['latitude'].to_list()
-print('Latitude')
-print(latitudes)
 
 longitudes = df['longitude'].to_list()
-print('Longitude')
-print(longitudes)
 
 for l in latitudes:
     if isinstance(l,str):
         print("String Located")
 
-def check_lat():
-    nearby_lat = []
-    for l in latitudes:
-        if l > latitude -5 and l < latitude + 5:
-            nearby_lat.append(l)
-    return nearby_lat
-
-
-def check_long():
-    nearby_long = []
-    for l in longitudes:
-        if l > longitude -5 and l < longitude + 5:
-            nearby_long.append(l)
-    return nearby_long
-
-longitudes_nearby = check_long()
-latitudes_nearby = check_lat()
-
-def countries_nearby():
-    countries = []
-    index = 0
-    if len(longitudes_nearby) > len(latitudes_nearby):
-        check_range = longitudes_nearby
-    else:
-        check_range = longitudes_nearby
-
-    for country in check_range:
-        index += 1
-        latitude = df.loc[index]['latitude']
-        longitude = df.loc[index]['latitude']
-        country = df.loc[(df['latitude'] == latitude) & (df['latitude'] == longitude)]
-        print(country)
-        countries.append(country)
-        print(countries)
-
-countries_nearby()
-
-# latitude_match = df[df['latitude'].between(0, 100)]
-# latitude_match_2 = df[df['latitude'].between(0,100)]
-
-# print(latitude_match)
-# print(latitude_match_2)
-
+latitude_match = df[df['latitude'].between(latitude -5, latitude + 5)]
+print("Matching Latitudes")
+print(latitude_match)
 
 # Attempt 1 - To find closest
 # index = abs(countries_df['latitude'] - (latitude).idxmin())
 # print(index)
-
-
 
 iss_position = (longitude,latitude)
 
