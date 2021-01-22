@@ -48,6 +48,12 @@ if sunset < current_time:
     print(f" Calculate {sunset - current_time}")
     print(f"Sunset time is {sunset}")
 
-#TODO figure out why this doesn't work / How Lambda Functions work.
-print(f"Sunrise time is {(lambda sunrise: str(sunrise)[:-3] + ':' + str(sunrise)[:-3])(sunrise)}")
-print(f"Sunrise time is {sunset}")
+if len(str(sunrise)) == 3:
+    print(f"Sunrise time is {str(sunrise)[:-2] + ':' + list(str(sunrise))[1] + list(str(sunrise))[2]}")
+
+else:
+    print(f"Sunrise time is {str(sunrise)[:-2] + ':' + list(str(sunrise))[2] + list(str(sunrise))[3]}")
+
+print(f"Sunset time is {str(sunset)[:-2] + ':' + list(str(sunset))[2] + list(str(sunset))[3]}")
+
+print(sunset)
