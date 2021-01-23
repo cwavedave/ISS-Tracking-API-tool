@@ -31,8 +31,12 @@ for l in latitudes:
         print("String Located")
 
 latitude_match = df[df['latitude'].between(latitude -5, latitude + 5)]
-print("Matching Latitudes")
-print(latitude_match)
+
+longitude_match = df[df['longitude'].between(longitude -5, longitude + 5)]
+
+nearby_countries = df[df['longitude'].between(longitude -5, longitude + 5) & df['latitude'].between(latitude -5, latitude + 5)]
+print("Closest Countries to the ISS")
+print(nearby_countries)
 
 # Attempt 1 - To find closest
 # index = abs(countries_df['latitude'] - (latitude).idxmin())
@@ -59,7 +63,8 @@ sunset = int(sun_times["results"]["sunset"].split("T")[1].split("+")[0][:-3].rep
 
 if sunset > current_time:
     print(f"Current time is {sunrise}")
-    print(f" Calculate {sunset - current_time}")
+    time_until_sunset = sunset - current_time
+    print(f"Calculate time until sunset in Vic - {str(time_until_sunset)[:-2] + ':' + list(str(time_until_sunset))[1] + list(str(time_until_sunset))[2]}")
     print(f"Sunset time is {sunset}")
 
 if len(str(sunrise)) == 3:
