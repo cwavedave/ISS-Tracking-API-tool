@@ -25,15 +25,61 @@ for l in latitudes:
     if isinstance(l,str):
         print("String Located")
 
-nearby_countries = df[df['longitude'].between(iss_location[1] -15, iss_location[1] + 15) & df['latitude'].between(iss_location[0] -15, iss_location[0] + 15)]
+nearby_countries = df[df['longitude'].between(iss_location[1] -5, iss_location[1] + 5) & df['latitude'].between(iss_location[0] -5, iss_location[0] + 5)]
 
 # Current limited use is, must be near the center of the country.
 countries_nearby_list = nearby_countries['name'].to_list()
 
-if len(countries_nearby_list) != 0:
-    print(countries_nearby_list)
-    print(f"Number of nearby countries - {len(countries_nearby_list)}")
+country_list = []
+print(iss_location[0])
 
+def nearby_countries():
+    for country in countries_nearby_list:
+        country_add = df.loc[(df['name'] == country)]
+        country_name = country_add['name'].item()
+        country_latitude = country_add['latitude'].item()
+        country_longitude = country_add['longitude'].item()
+        direction = []
+        if iss_lat < country_latitude:
+            direction.append("North")
+        else:
+            direction.append("South")
+        if iss_long < country_longitude:
+            direction.append("East")
+        else:
+            direction.append("West")
+
+        country = {country_name: country_add['name'].item(), 'Latitude': country_add['latitude'].item(), 'Longitude':country_add['longitude'].item(),
+                   "Direction": f"{' '.join(direction)} of ISS"}
+        country_list.append(country)
+
+iss_lat = get_iss_location()[0]
+iss_long = get_iss_location()[1]
+
+def direction_NS(iss_lat, country_location):
+    if iss_lat > country_location['latitude']:
+        print(f"ISS is North of {country_location['name']}")
+        return "North"
+    else:
+        print("South")
+        return "South"
+
+def direction_WE(iss_long, country_location):
+    if iss_lat > country_location['latitude']:
+        print(f"ISS is North of {country_location['name']}")
+        return "North"
+    else:
+        print("South")
+        return "South"
+
+#Check if there are countries nearby
+if len(countries_nearby_list) != 0:
+    # print(countries_nearby_list)
+    print(f"Number of nearby countries - {len(countries_nearby_list)}")
+    nearby_countries()
+    print(country_list)
+
+#LOCATION
 vic_lo = 2.25486
 vic_la = 41.93012
 
@@ -41,14 +87,15 @@ vic_la = 41.93012
 response = requests.get(url=f'https://api.sunrise-sunset.org/json?lat={vic_la}&lng={vic_lo}&formatted=0')
 sun_times = response.json()
 
-# print(sun_times)
-
+#GET CURRENT TIME
 current_time = int(str(now).split(' ')[1].split('.')[0][:-3].replace(":",""))
 # print(current_time)
 
+#SUNRISE FORMATTING INTO DIGITS
 sunrise = int(sun_times["results"]["sunrise"].split("T")[1].split("+")[0][:-3].replace(":",""))
 sunset = int(sun_times["results"]["sunset"].split("T")[1].split("+")[0][:-3].replace(":",""))
 
+#SUNSET IN LOCATION
 if sunset > current_time:
     print(f"Current time is {sunrise}")
     time_until_sunset = sunset - current_time
@@ -59,17 +106,20 @@ if sunset > current_time:
         print(f"Calculate time until sunset in Vic - {str(time_until_sunset)[:-2] + ':' + list(str(time_until_sunset))[1] + list(str(time_until_sunset))[2]}")
     print(f"Sunset time is {sunset}")
 
+#SUNRISE IN LOCATION
 if sunrise > current_time:
     print("Time until Sunrise ( Morning ) ")
 
+#TIME UNTIL SUNRISE TOMORROW
 if sunrise < current_time and sunset < current_time:
     sunrise_time_tomorrow = 2400 - current_time + sunrise
     print(f"Time until sunrise tomorrow {sunrise_time_tomorrow}")
 
+#FORMATTING FOR TIME OUTPUT
 if len(str(sunrise)) == 3:
     print(f"Sunrise time is {str(sunrise)[:-2] + ':' + list(str(sunrise))[1] + list(str(sunrise))[2]}")
-
 else:
     print(f"Sunrise time is {str(sunrise)[:-2] + ':' + list(str(sunrise))[2] + list(str(sunrise))[3]}")
 
+#SUNSET TIME - ALWAYS 4 DIGITS LONG
 print(f"Sunset time is {str(sunset)[:-2] + ':' + list(str(sunset))[2] + list(str(sunset))[3]}")
