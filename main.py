@@ -1,6 +1,14 @@
 import requests
 import pandas as pd
 import datetime as dt
+import time
+import smtplib
+
+CLIENT_EMAIL = ""
+CLIENT_PASSWORD = ""
+
+program = True
+email = "david@creativewavelength.co.uk"
 
 now = dt.datetime.now()
 countries_csv = pd.read_csv("countries.csv", sep='\s*,\s*', engine='python')
@@ -14,20 +22,22 @@ def get_sun(lat,long):
     return sun_times
 
 def user_input():
-    user_latitude = input("Enter Latitude\n")
-    user_longitude = input("Enter longitude\n")
-    question = input("Do you want email alerts when the ISS is visible from your location?")
-    if question.lower() == "y":
-        user_email = input("What is your email address?")
-        return (user_latitude,user_longitude,user_email)
-    else:
-        return (user_latitude,user_longitude)
+    user = user_input()
+    user_la = user[0]
+    user_lo = user[1]
+    print(len(user_input()))
+    user_choice = input("Do you want to get email updates when the ISS is near your location and visible?\n Type 'y for yes or type anything else for no")
+    if user_choice.lower() == 'y':
+        user_latitude = input("Enter Latitude\n")
+        user_longitude = input("Enter longitude\n")
+        question = input("Do you want email alerts when the ISS is visible from your location?")
+        if question.lower() == "y":
+            user_email = input("What is your email address?\n This Application is not currently secured, please do not use a work / primary email address\n")
+            return (user_latitude,user_longitude,user_email)
+        else:
+            return (user_latitude,user_longitude)
 
-user = user_input()
-user_la = user[0]
-user_lo = user[1]
-print(len(user_input()))
-
+user_input()
 
 def get_iss_location():
     response = requests.get(url="http://api.open-notify.org/iss-now.json")
@@ -42,11 +52,6 @@ print(f"ISS locations is {(iss_location)}\n")
 
 latitudes = df['latitude'].to_list()
 longitudes = df['longitude'].to_list()
-
-# Bug Catcher used earlier for finding formatting issue in data
-# for l in latitudes:
-#     if isinstance(l,str):
-#         print("String Located")
 
 nearby_countries = df[df['longitude'].between(iss_location[1] -5, iss_location[1] + 5) & df['latitude'].between(iss_location[0] -5, iss_location[0] + 5)]
 
@@ -115,7 +120,7 @@ print("=========================================================================
 
 #Suntimes API
 
-def local(user_la, user_lo):
+def local_is_night(user_la, user_lo):
     #GET CURRENT TIME
     current_time = int(str(now).split(' ')[1].split('.')[0][:-3].replace(":",""))
     sun_times = get_sun(user_la,user_lo)
@@ -131,9 +136,9 @@ def local(user_la, user_lo):
         time_until_sunset = sunset - current_time
         print(time_until_sunset)
         if len(str(time_until_sunset)) <= 2:
-            print(f"{time_until_sunset} Minutes left until sunset in Vic")
+            print(f"{time_until_sunset} Minutes left until sunset in Submitted Location")
         else:
-            print(f"Calculate time until sunset in Vic - {str(time_until_sunset)[:-2] + ':' + list(str(time_until_sunset))[1] + list(str(time_until_sunset))[2]}")
+            print(f"Calculate time until sunset in Submitted location - {str(time_until_sunset)[:-2] + ':' + list(str(time_until_sunset))[1] + list(str(time_until_sunset))[2]}")
         print(f"Sunset time is {sunset}")
 
     #SUNRISE IN LOCATION
@@ -154,4 +159,42 @@ def local(user_la, user_lo):
     #SUNSET TIME - ALWAYS 4 DIGITS LONG
     print(f"Sunset time is {str(sunset)[:-2] + ':' + list(str(sunset))[2] + list(str(sunset))[3]}")
 
-local(user_la,user_lo)
+    #IS DARK?
+    if sunset < current_time:
+        return True
+    else:
+        return False
+
+user = user_input()
+user_la = user[0]
+user_lo = user[1]
+
+if len(user) == 3:
+    # Can pass email here if needed
+    user_email = user[2]
+    local_is_night(user_la,user_lo)
+else:
+    local_is_night(user_la,user_lo)
+
+def is_iss_overhead():
+    print("Checking")
+
+while program == True:
+    if is_iss_overhead() and local_is_night():
+        while True:
+            if is_iss_overhead() and local_is_night():
+                with smtplib.SMTP("smtp.gmail.com") as connection:
+                    connection.starttls()
+                    connection.login(user=CLIENT_EMAIL, password=CLIENT_PASSWORD)
+                    connection.sendmail(
+                    from_addr=CLIENT_EMAIL,
+                    to_addrs=f"{email}",
+                    msg=f"Subject:Look Up 👆, The ISS is above your head! \n\nNo message tag yet")
+    else:
+        time.sleep(60)
+
+
+# Bug Catcher used earlier for finding formatting issue in data
+# for l in latitudes:
+#     if isinstance(l,str):
+#         print("String Located")
