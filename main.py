@@ -22,22 +22,38 @@ def get_sun(lat,long):
     return sun_times
 
 def user_input():
-    user = user_input()
-    user_la = user[0]
-    user_lo = user[1]
-    print(len(user_input()))
-    user_choice = input("Do you want to get email updates when the ISS is near your location and visible?\n Type 'y for yes or type anything else for no")
-    if user_choice.lower() == 'y':
-        user_latitude = input("Enter Latitude\n")
-        user_longitude = input("Enter longitude\n")
-        question = input("Do you want email alerts when the ISS is visible from your location?")
-        if question.lower() == "y":
-            user_email = input("What is your email address?\n This Application is not currently secured, please do not use a work / primary email address\n")
-            return (user_latitude,user_longitude,user_email)
-        else:
-            return (user_latitude,user_longitude)
+    search = False
+    while search == False:
+        search_area = input("Type in your country name or type 'manual', if you want to use your own coordinates\n")
 
-user_input()
+        if search_area.title() in df['name']:
+            matched_result = df.loc[(df['name'] == search_area.title())]
+            user_latitude = matched_result['latitude'].item()
+            user_longitude = matched_result['longitude'].item()
+            search = True
+
+        elif search_area.lower() == 'manual':
+            user_latitude = input("Enter Latitude\n")
+            user_longitude = input("Enter longitude\n")
+            search = True
+        else:
+            print("Country not found in Database, check spelling or type 'manual' to enter location manually\n")
+
+    question = input("Do you want email alerts when the ISS is visible from your location?")
+
+    if question.lower() == "y":
+        print("Email Alert / Future use case / Testing")
+        user_email = input("What is your email address?\n This Application is not currently secured, please do not use a work / primary email address\n")
+        return (user_latitude,user_longitude,user_email)
+    else:
+        return (user_latitude,user_longitude)
+
+user = user_input()
+user_la = user[0]
+user_lo = user[1]
+print(user)
+print(len(user))
+
 
 def get_iss_location():
     response = requests.get(url="http://api.open-notify.org/iss-now.json")
@@ -113,12 +129,14 @@ else:
     nearby_countries()
     print("=====================================================================================")
 
-
 print("\n=====================================================================================")
 print("Current Location Data")
 print("=====================================================================================")
 
 #Suntimes API
+# All this code does, is return True if it's night time where the user currently is.
+# Most of this code is for printing local information accessed from API / learning / testing features / keeping it there for potential future expansion.
+# Essentially though, all it does is return True at night.
 
 def local_is_night(user_la, user_lo):
     #GET CURRENT TIME
@@ -165,10 +183,6 @@ def local_is_night(user_la, user_lo):
     else:
         return False
 
-user = user_input()
-user_la = user[0]
-user_lo = user[1]
-
 if len(user) == 3:
     # Can pass email here if needed
     user_email = user[2]
@@ -193,8 +207,7 @@ while program == True:
     else:
         time.sleep(60)
 
-
 # Bug Catcher used earlier for finding formatting issue in data
 # for l in latitudes:
-#     if isinstance(l,str):
-#         print("String Located")
+# if isinstance(l,str):
+# print("String Located")
