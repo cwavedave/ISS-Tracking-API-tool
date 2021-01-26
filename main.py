@@ -3,6 +3,7 @@ import pandas as pd
 import datetime as dt
 import time
 import smtplib
+import json
 
 CLIENT_EMAIL = ""
 CLIENT_PASSWORD = ""
@@ -21,13 +22,14 @@ def get_sun(lat,long):
     sun_times = response.json()
     return sun_times
 
+#COLLECTS USER LAT / LONG & ASKS IF THEY WANT TO SUBMIT EMAIL FOR ALERTS. SAVES DATA TO JSON IF YES.
 def user_input():
     user = {}
     search = False
     while search == False:
         search_area = input("Type in your country name / ISO code. \nOr type 'manual', if you want to use your own coordinates\n")
 
-        if len(df.loc[(df['name'] == search_area)]) > 0:
+        if len(df.loc[(df['name'] == search_area.title())]) > 0:
             matched_result = df.loc[(df['name'] == search_area.title())]
             user_latitude = matched_result['latitude'].item()
             user_longitude = matched_result['longitude'].item()
@@ -41,7 +43,6 @@ def user_input():
             print(f"Database entry for {matched_result['name'].item()} used for latitude ({user_latitude}) & longitude({user_longitude})")
             search = True
 
-
         elif search_area.lower() == 'manual':
             user_latitude = input("Enter Latitude\n")
             user_longitude = input("Enter longitude\n")
@@ -53,17 +54,34 @@ def user_input():
 
     if question.lower() == "y" or question.lower() ==  "yes":
         print("Email Alert / Future use case / Testing")
+
         user_email = input("What is your email address?\n This Application is not currently secured, please do not use a work / primary email address\n")
-        return (user_latitude,user_longitude,user_email)
+        new_entry = {user_email:{'Latitude':user_latitude, 'Longitude': user_longitude}}
+
+        try:
+            with open(f"./users.json", mode="r") as add_entry:
+                data = json.load(add_entry)
+                data.update(new_entry)
+                # Reads old data
+
+        except FileNotFoundError:
+            with open(f"./users.json", mode="w") as add_entry:
+                json.dump(new_entry, add_entry, indent=4)
+
+        else:
+            print("Something")
+            with open(f"./users.json",mode="w") as add_entry:
+                json.dump(data, add_entry, indent=4)
+
+        finally:
+            return(user_latitude,user_longitude,user_email)
+
     else:
         return (user_latitude,user_longitude)
 
 user = user_input()
 user_la = user[0]
 user_lo = user[1]
-print(user)
-print(len(user))
-
 
 def get_iss_location():
     response = requests.get(url="http://api.open-notify.org/iss-now.json")
@@ -75,6 +93,31 @@ def get_iss_location():
 
 iss_location = get_iss_location()
 print(f"ISS locations is {(iss_location)}\n")
+
+
+def find_user():
+    ISS = get_iss_location()
+    try:
+        with open("users.json") as data_file:
+            data = json.load(data_file)
+    except FileNotFoundError:
+        print("File not Found")
+        return False
+    else:
+        print(data)
+        # if data['latitude'].between(ISS[1] -5, ISS[1] + 5) in data and data['longitude'].between(ISS[1] -5, ISS[1] + 5) in data:
+        #     print(data)
+        #     print(data['user']['user'])
+        #     print(data['user']["latitude"])
+        #     print(data['user']["longitude"])
+        # elif len(data) > 1:
+        #     print("File Contains Data but nothing near ISS at this time")
+        #     print(data)
+        # else:
+        #     print("No Matching User Found")
+
+find_user()
+
 
 latitudes = df['latitude'].to_list()
 longitudes = df['longitude'].to_list()
