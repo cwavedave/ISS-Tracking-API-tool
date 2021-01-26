@@ -22,15 +22,25 @@ def get_sun(lat,long):
     return sun_times
 
 def user_input():
+    user = {}
     search = False
     while search == False:
-        search_area = input("Type in your country name or type 'manual', if you want to use your own coordinates\n")
+        search_area = input("Type in your country name / ISO code. \nOr type 'manual', if you want to use your own coordinates\n")
 
-        if search_area.title() in df['name']:
+        if len(df.loc[(df['name'] == search_area)]) > 0:
             matched_result = df.loc[(df['name'] == search_area.title())]
             user_latitude = matched_result['latitude'].item()
             user_longitude = matched_result['longitude'].item()
+            print(f"Database entry for {matched_result['name'].item()} used for latitude ({user_latitude}) & longitude({user_longitude})")
             search = True
+
+        elif len(df.loc[(df['country'] == search_area.upper())]) > 0:
+            matched_result = df.loc[(df['country'] == search_area.upper())]
+            user_latitude = matched_result['latitude'].item()
+            user_longitude = matched_result['longitude'].item()
+            print(f"Database entry for {matched_result['name'].item()} used for latitude ({user_latitude}) & longitude({user_longitude})")
+            search = True
+
 
         elif search_area.lower() == 'manual':
             user_latitude = input("Enter Latitude\n")
@@ -39,9 +49,9 @@ def user_input():
         else:
             print("Country not found in Database, check spelling or type 'manual' to enter location manually\n")
 
-    question = input("Do you want email alerts when the ISS is visible from your location?")
+    question = input("Do you want email alerts when the ISS is visible from your location?\n")
 
-    if question.lower() == "y":
+    if question.lower() == "y" or question.lower() ==  "yes":
         print("Email Alert / Future use case / Testing")
         user_email = input("What is your email address?\n This Application is not currently secured, please do not use a work / primary email address\n")
         return (user_latitude,user_longitude,user_email)
@@ -119,7 +129,7 @@ def direction_WE(iss_long, country_location):
 if len(countries_nearby_list) != 0:
     # print(countries_nearby_list)
     print("=====================================================================================")
-    print(f"Number of nearby countries nearby the ISS - {len(countries_nearby_list)}")
+    print(f"COUNTRIES THE ISS IS CURRENTLY PASSING OVER - {len(countries_nearby_list)}")
     nearby_countries()
     print("=====================================================================================")
     print(country_list)
@@ -131,6 +141,7 @@ else:
 
 print("\n=====================================================================================")
 print("Current Location Data")
+print("Times are in UTC")
 print("=====================================================================================")
 
 #Suntimes API
