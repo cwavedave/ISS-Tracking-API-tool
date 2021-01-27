@@ -56,27 +56,30 @@ def user_input():
         print("Email Alert / Future use case / Testing")
 
         user_email = input("What is your email address?\n This Application is not currently secured, please do not use a work / primary email address\n")
-        new_entry = {user_email:{'Latitude':user_latitude, 'Longitude': user_longitude}}
+        new_entry = {user_email : { 'latitude':user_latitude, 'longitude': user_longitude}}
 
         try:
-            with open(f"./users.json", mode="r") as add_entry:
-                data = json.load(add_entry)
+            try:
+                with open("users.json", "r") as user_file:
+                    # Reading old data
+                    data = json.load(user_file)
+            except FileNotFoundError:
+                with open("users.json", "w") as user_file:
+                    json.dump(new_entry, user_file, indent=4)
+            else:
+                # Updating old data with new data
                 data.update(new_entry)
-                # Reads old data
 
-        except FileNotFoundError:
-            with open(f"./users.json", mode="w") as add_entry:
-                json.dump(new_entry, add_entry, indent=4)
-
-        else:
-            print("Something")
-            with open(f"./users.json",mode="w") as add_entry:
-                json.dump(data, add_entry, indent=4)
+                with open("users.json", "w") as data_file:
+                    # Saving updated data
+                    json.dump(data, data_file, indent=4)
 
         finally:
-            return(user_latitude,user_longitude,user_email)
+            print("User Lat, Long & Email Returned")
+            return (user_latitude,user_longitude,user_email)
 
     else:
+        print("user lat & user long returned only")
         return (user_latitude,user_longitude)
 
 user = user_input()
@@ -98,13 +101,22 @@ print(f"ISS locations is {(iss_location)}\n")
 def find_user():
     ISS = get_iss_location()
     try:
-        with open("users.json") as data_file:
-            data = json.load(data_file)
+        json_stored = pd.read_json('users.json', orient='index')
+        df_stored = pd.DataFrame(json_stored)
+        print(f" ISS location = {ISS}")
+
     except FileNotFoundError:
         print("File not Found")
         return False
     else:
-        print(data)
+        print(df_stored)
+        bob = df_stored[df_stored['longitude'].between(ISS[1] - 5, ISS[1] + 5)]
+        print(bob)
+        # print(df_stored['latitude'])
+        # print(data)
+        # for key, value in data:
+        #     print(key)
+        #     print(value)
         # if data['latitude'].between(ISS[1] -5, ISS[1] + 5) in data and data['longitude'].between(ISS[1] -5, ISS[1] + 5) in data:
         #     print(data)
         #     print(data['user']['user'])
@@ -122,7 +134,7 @@ find_user()
 latitudes = df['latitude'].to_list()
 longitudes = df['longitude'].to_list()
 
-nearby_countries = df[df['longitude'].between(iss_location[1] -5, iss_location[1] + 5) & df['latitude'].between(iss_location[0] -5, iss_location[0] + 5)]
+nearby_countries = df[df['longitude'].between(iss_location[1] -45, iss_location[1] + 45) & df['latitude'].between(iss_location[0] -45, iss_location[0] + 45)]
 
 # Current limited use is, must be near the center of the country.
 countries_nearby_list = nearby_countries['name'].to_list()
