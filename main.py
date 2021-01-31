@@ -40,7 +40,10 @@ def user_input():
             matched_result = df.loc[(df['country'] == search_area.upper())]
             user_latitude = matched_result['latitude'].item()
             user_longitude = matched_result['longitude'].item()
+            print("=====================================================================================")
             print(f"Database entry for {matched_result['name'].item()} used for latitude ({user_latitude}) & longitude({user_longitude})")
+            print("=====================================================================================")
+
             search = True
 
         elif search_area.lower() == 'manual':
@@ -55,27 +58,30 @@ def user_input():
     if question.lower() == "y" or question.lower() ==  "yes":
         print("Email Alert / Future use case / Testing")
 
-        user_email = input("What is your email address?\n This Application is not currently secured, please do not use a work / primary email address\n")
-        new_entry = {user_email : { 'latitude':user_latitude, 'longitude': user_longitude}}
+        user_email = input("\nWhat is your email address?\nThis Application is not currently secured, please do not use a work / primary email address\n")
+        new_entry = {'email': [user_email], 'latitude': [user_latitude], 'longitude':[user_longitude]}
 
         try:
-            try:
-                with open("users.json", "r") as user_file:
-                    # Reading old data
-                    data = json.load(user_file)
-            except FileNotFoundError:
-                with open("users.json", "w") as user_file:
-                    json.dump(new_entry, user_file, indent=4)
-            else:
-                # Updating old data with new data
-                data.update(new_entry)
+            with open("users.json", "r") as user_file:
+                # Reading old data
+                data = json.load(user_file)
+                bob = pd.DataFrame("users.json")
+                print(bob)
+                print("bobs uncle")
 
-                with open("users.json", "w") as data_file:
-                    # Saving updated data
-                    json.dump(data, data_file, indent=4)
+        except FileNotFoundError:
+            with open("users.json", "w") as user_file:
+                    json.dump(new_entry, user_file, indent=4)
+        else:
+            print("else")
+            # Updating old data with new data
+            # data.update(new_entry)
+            # with open("users.json", "w") as data_file:
+            #     # Saving updated data
+            #     json.dump(data, data_file, indent=4)
 
         finally:
-            print("User Lat, Long & Email Returned")
+            print("\nUser Lat, Long & Email Returned")
             return (user_latitude,user_longitude,user_email)
 
     else:
@@ -101,7 +107,7 @@ print(f"ISS locations is {(iss_location)}\n")
 def find_user():
     ISS = get_iss_location()
     try:
-        json_stored = pd.read_json('users.json', orient='index')
+        json_stored = pd.read_json('users.json')
         df_stored = pd.DataFrame(json_stored)
         print(f" ISS location = {ISS}")
 
@@ -109,24 +115,14 @@ def find_user():
         print("File not Found")
         return False
     else:
+        print("df_stored")
         print(df_stored)
-        bob = df_stored[df_stored['longitude'].between(ISS[1] - 5, ISS[1] + 5)]
-        print(bob)
-        # print(df_stored['latitude'])
-        # print(data)
-        # for key, value in data:
-        #     print(key)
-        #     print(value)
-        # if data['latitude'].between(ISS[1] -5, ISS[1] + 5) in data and data['longitude'].between(ISS[1] -5, ISS[1] + 5) in data:
-        #     print(data)
-        #     print(data['user']['user'])
-        #     print(data['user']["latitude"])
-        #     print(data['user']["longitude"])
-        # elif len(data) > 1:
-        #     print("File Contains Data but nothing near ISS at this time")
-        #     print(data)
-        # else:
-        #     print("No Matching User Found")
+
+        condition = df_stored['latitude'].between(-45,45)
+        print(condition)
+        # match = index[condition]
+        # print('match')
+        # print(match)
 
 find_user()
 
@@ -183,7 +179,7 @@ def direction_WE(iss_long, country_location):
 #Check if there are countries nearby
 if len(countries_nearby_list) != 0:
     # print(countries_nearby_list)
-    print("=====================================================================================")
+    print("\n=====================================================================================")
     print(f"COUNTRIES THE ISS IS CURRENTLY PASSING OVER - {len(countries_nearby_list)}")
     nearby_countries()
     print("=====================================================================================")
