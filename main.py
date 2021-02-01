@@ -73,6 +73,7 @@ def user_input():
                         'longitude': [-3.74922, -8.24389, -95.712891, 104.195397]}
                 default_df = pd.DataFrame(default, columns=['email', 'latitude', 'longitude'])
                 default_df.to_json(r'users.json')
+                print("nothing")
         else:
             df_stored = pd.DataFrame(data)
             updated_df = df_stored.append(new_entry, ignore_index=True)
