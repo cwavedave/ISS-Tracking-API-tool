@@ -72,15 +72,13 @@ def user_input():
                         'latitude': [40.463667, 53.41291, 37.09024, 35.86166],
                         'longitude': [-3.74922, -8.24389, -95.712891, 104.195397]}
                 default_df = pd.DataFrame(default, columns=['email', 'latitude', 'longitude'])
-                default_df.to_json(r'users.json')
-                print("nothing")
+                updated_df = default_df.append(new_entry, ignore_index=True)
+                updated_df.to_json(r'users.json', indent=4)
         else:
             df_stored = pd.DataFrame(data)
             updated_df = df_stored.append(new_entry, ignore_index=True)
+            updated_df.to_json(r'users.json',indent=4)
 
-            with open("users.json", "w") as user_file:
-                #saving updated data
-                json.dump(updated_df,user_file, indent=4)
         finally:
             print("\nUser Lat, Long & Email Returned")
             return (user_latitude,user_longitude,user_email)
