@@ -59,27 +59,27 @@ def user_input():
         print("Email Alert / Future use case / Testing")
 
         user_email = input("\nWhat is your email address?\nThis Application is not currently secured, please do not use a work / primary email address\n")
-        new_entry = {'email': [user_email], 'latitude': [user_latitude], 'longitude':[user_longitude]}
+        new_entry = {'email': user_email, 'latitude': user_latitude, 'longitude':user_longitude}
 
         try:
             with open("users.json", "r") as user_file:
                 # Reading old data
-                data = json.load(user_file)
-                bob = pd.DataFrame("users.json")
-                print(bob)
-                print("bobs uncle")
+                data = pd.read_json("users.json")
 
         except FileNotFoundError:
             with open("users.json", "w") as user_file:
-                    json.dump(new_entry, user_file, indent=4)
+                default = {'email': ['david@creative-wavelength.com', 'porfirio.cd52000a@mailerq.net', 'rashad.0c3e9859@inboxeen.com', 'darrick.0694ea0c@creative-wavelength.com'],
+                        'latitude': [40.463667, 53.41291, 37.09024, 35.86166],
+                        'longitude': [-3.74922, -8.24389, -95.712891, 104.195397]}
+                default_df = pd.DataFrame(default, columns=['email', 'latitude', 'longitude'])
+                default_df.to_json(r'users.json')
         else:
-            print("else")
-            # Updating old data with new data
-            # data.update(new_entry)
-            # with open("users.json", "w") as data_file:
-            #     # Saving updated data
-            #     json.dump(data, data_file, indent=4)
+            df_stored = pd.DataFrame(data)
+            updated_df = df_stored.append(new_entry, ignore_index=True)
 
+            with open("users.json", "w") as user_file:
+                #saving updated data
+                json.dump(updated_df,user_file, indent=4)
         finally:
             print("\nUser Lat, Long & Email Returned")
             return (user_latitude,user_longitude,user_email)
@@ -101,8 +101,6 @@ def get_iss_location():
     return (latitude,longitude)
 
 iss_location = get_iss_location()
-print(f"ISS locations is {(iss_location)}\n")
-
 
 def find_user():
     ISS = get_iss_location()
@@ -117,12 +115,8 @@ def find_user():
     else:
         print("df_stored")
         print(df_stored)
-
         condition = df_stored['latitude'].between(-45,45)
         print(condition)
-        # match = index[condition]
-        # print('match')
-        # print(match)
 
 find_user()
 
